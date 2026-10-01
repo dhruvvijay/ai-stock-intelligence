@@ -1,0 +1,121 @@
+import type { MarketIndex, SectorPerformance, HeatmapEntry, TopMover, TrendingStock } from '@/types/market';
+
+export const mockIndices: MarketIndex[] = [
+  {
+    name: 'NIFTY 50',
+    symbol: 'NIFTY',
+    value: 24178.50,
+    change: 187.35,
+    changePercent: 0.78,
+    dayHigh: 24256.00,
+    dayLow: 23985.40,
+    volume: 2345678901,
+    previousClose: 23991.15,
+    aiSentiment: 'Bullish',
+    sentimentScore: 72,
+    sparklineData: [23650, 23720, 23680, 23810, 23780, 23900, 23850, 23920, 23990, 24050, 24020, 24100, 24080, 24150, 24120, 24178],
+  },
+  {
+    name: 'SENSEX',
+    symbol: 'SENSEX',
+    value: 79542.80,
+    change: 512.40,
+    changePercent: 0.65,
+    dayHigh: 79780.00,
+    dayLow: 78920.50,
+    volume: 3456789012,
+    previousClose: 79030.40,
+    aiSentiment: 'Bullish',
+    sentimentScore: 68,
+    sparklineData: [78200, 78350, 78280, 78500, 78450, 78700, 78650, 78800, 78950, 79100, 79050, 79200, 79300, 79400, 79350, 79542],
+  },
+  {
+    name: 'BANK NIFTY',
+    symbol: 'BANKNIFTY',
+    value: 52345.60,
+    change: 678.90,
+    changePercent: 1.31,
+    dayHigh: 52500.00,
+    dayLow: 51580.20,
+    volume: 1234567890,
+    previousClose: 51666.70,
+    aiSentiment: 'Bullish',
+    sentimentScore: 78,
+    sparklineData: [51000, 51150, 51080, 51350, 51280, 51500, 51450, 51700, 51850, 52000, 51950, 52100, 52200, 52300, 52250, 52345],
+  },
+  {
+    name: 'NIFTY IT',
+    symbol: 'NIFTYIT',
+    value: 38920.30,
+    change: -245.60,
+    changePercent: -0.63,
+    dayHigh: 39250.00,
+    dayLow: 38800.50,
+    volume: 567890123,
+    previousClose: 39165.90,
+    aiSentiment: 'Bearish',
+    sentimentScore: 35,
+    sparklineData: [39400, 39350, 39380, 39250, 39280, 39150, 39180, 39050, 39100, 38980, 39020, 38950, 38900, 38920, 38880, 38920],
+  },
+];
+
+export const mockSectors: SectorPerformance[] = [
+  { name: 'Banking', changePercent: 2.15, marketCap: 4500000000000, topStock: 'HDFCBANK', stocks: 12, color: '#6366f1' },
+  { name: 'IT', changePercent: -0.78, marketCap: 3200000000000, topStock: 'TCS', stocks: 10, color: '#8b5cf6' },
+  { name: 'Energy', changePercent: 1.45, marketCap: 2800000000000, topStock: 'RELIANCE', stocks: 8, color: '#06b6d4' },
+  { name: 'FMCG', changePercent: -0.32, marketCap: 2100000000000, topStock: 'HINDUNILVR', stocks: 8, color: '#f59e0b' },
+  { name: 'Auto', changePercent: 2.85, marketCap: 1800000000000, topStock: 'TATAMOTORS', stocks: 10, color: '#22c55e' },
+  { name: 'Pharma', changePercent: 0.95, marketCap: 1500000000000, topStock: 'SUNPHARMA', stocks: 8, color: '#ec4899' },
+  { name: 'Telecom', changePercent: 1.22, marketCap: 1200000000000, topStock: 'BHARTIARTL', stocks: 4, color: '#14b8a6' },
+  { name: 'Metals', changePercent: 3.10, marketCap: 900000000000, topStock: 'TATASTEEL', stocks: 8, color: '#f97316' },
+  { name: 'Realty', changePercent: -1.45, marketCap: 400000000000, topStock: 'DLF', stocks: 6, color: '#ef4444' },
+  { name: 'Media', changePercent: 0.52, marketCap: 200000000000, topStock: 'ZEEL', stocks: 4, color: '#a855f7' },
+];
+
+export const mockHeatmap: HeatmapEntry[] = [
+  { symbol: 'RELIANCE', name: 'Reliance', sector: 'Energy', changePercent: 0.86, marketCap: 19200, value: 19200 },
+  { symbol: 'TCS', name: 'TCS', sector: 'IT', changePercent: -0.54, marketCap: 14500, value: 14500 },
+  { symbol: 'HDFCBANK', name: 'HDFC Bank', sector: 'Banking', changePercent: 2.04, marketCap: 12800, value: 12800 },
+  { symbol: 'INFY', name: 'Infosys', sector: 'IT', changePercent: -0.94, marketCap: 7200, value: 7200 },
+  { symbol: 'ICICIBANK', name: 'ICICI Bank', sector: 'Banking', changePercent: 1.81, marketCap: 8900, value: 8900 },
+  { symbol: 'HINDUNILVR', name: 'HUL', sector: 'FMCG', changePercent: -0.53, marketCap: 5600, value: 5600 },
+  { symbol: 'SBIN', name: 'SBI', sector: 'Banking', changePercent: 2.91, marketCap: 7200, value: 7200 },
+  { symbol: 'BHARTIARTL', name: 'Bharti Airtel', sector: 'Telecom', changePercent: 1.80, marketCap: 8500, value: 8500 },
+  { symbol: 'ITC', name: 'ITC', sector: 'FMCG', changePercent: -0.98, marketCap: 5500, value: 5500 },
+  { symbol: 'TATAMOTORS', name: 'Tata Motors', sector: 'Auto', changePercent: 3.16, marketCap: 3200, value: 3200 },
+  { symbol: 'BAJFINANCE', name: 'Bajaj Finance', sector: 'NBFC', changePercent: 1.06, marketCap: 4500, value: 4500 },
+  { symbol: 'SUNPHARMA', name: 'Sun Pharma', sector: 'Pharma', changePercent: 1.45, marketCap: 3800, value: 3800 },
+  { symbol: 'MARUTI', name: 'Maruti', sector: 'Auto', changePercent: -1.09, marketCap: 3800, value: 3800 },
+  { symbol: 'WIPRO', name: 'Wipro', sector: 'IT', changePercent: -1.04, marketCap: 2800, value: 2800 },
+  { symbol: 'ADANIENT', name: 'Adani Ent.', sector: 'Conglomerate', changePercent: 1.88, marketCap: 3600, value: 3600 },
+  { symbol: 'ASIANPAINT', name: 'Asian Paints', sector: 'Materials', changePercent: -0.80, marketCap: 2800, value: 2800 },
+];
+
+export const mockTopGainers: TopMover[] = [
+  { symbol: 'TATAMOTORS', name: 'Tata Motors', price: 872.40, change: 26.70, changePercent: 3.16, volume: 21345678, sector: 'Auto' },
+  { symbol: 'SBIN', name: 'State Bank of India', price: 808.75, change: 22.85, changePercent: 2.91, volume: 25678901, sector: 'Banking' },
+  { symbol: 'HDFCBANK', name: 'HDFC Bank', price: 1678.90, change: 33.60, changePercent: 2.04, volume: 18234567, sector: 'Banking' },
+  { symbol: 'ADANIENT', name: 'Adani Enterprises', price: 3156.80, change: 58.35, changePercent: 1.88, volume: 5678901, sector: 'Conglomerate' },
+  { symbol: 'ICICIBANK', name: 'ICICI Bank', price: 1265.35, change: 22.55, changePercent: 1.81, volume: 14567890, sector: 'Banking' },
+  { symbol: 'BHARTIARTL', name: 'Bharti Airtel', price: 1505.20, change: 26.55, changePercent: 1.80, volume: 6789012, sector: 'Telecom' },
+  { symbol: 'SUNPHARMA', name: 'Sun Pharma', price: 1578.90, change: 22.55, changePercent: 1.45, volume: 4567890, sector: 'Pharma' },
+  { symbol: 'BAJFINANCE', name: 'Bajaj Finance', price: 7256.30, change: 75.80, changePercent: 1.06, volume: 3456789, sector: 'NBFC' },
+];
+
+export const mockTopLosers: TopMover[] = [
+  { symbol: 'MARUTI', name: 'Maruti Suzuki', price: 12145.60, change: -134.40, changePercent: -1.09, volume: 987654, sector: 'Auto' },
+  { symbol: 'WIPRO', name: 'Wipro', price: 535.20, change: -5.60, changePercent: -1.04, volume: 7654321, sector: 'IT' },
+  { symbol: 'ITC', name: 'ITC', price: 440.85, change: -4.35, changePercent: -0.98, volume: 19876543, sector: 'FMCG' },
+  { symbol: 'INFY', name: 'Infosys', price: 1732.45, change: -16.45, changePercent: -0.94, volume: 8765432, sector: 'IT' },
+  { symbol: 'ASIANPAINT', name: 'Asian Paints', price: 2912.45, change: -23.35, changePercent: -0.80, volume: 1234567, sector: 'Materials' },
+  { symbol: 'TCS', name: 'TCS', price: 3956.80, change: -21.65, changePercent: -0.54, volume: 3456789, sector: 'IT' },
+  { symbol: 'HINDUNILVR', name: 'Hindustan Unilever', price: 2385.60, change: -12.80, changePercent: -0.53, volume: 2345678, sector: 'FMCG' },
+];
+
+export const mockTrending: TrendingStock[] = [
+  { symbol: 'TATAMOTORS', name: 'Tata Motors', price: 872.40, changePercent: 3.16, reason: 'JLR delivery numbers exceed expectations', aiRating: 85, searches: 45000 },
+  { symbol: 'SBIN', name: 'SBI', price: 808.75, changePercent: 2.91, reason: 'RBI rate cut expectation boosting banks', aiRating: 78, searches: 38000 },
+  { symbol: 'RELIANCE', name: 'Reliance', price: 2847.50, changePercent: 0.86, reason: 'Jio Platforms valuation upgrade rumor', aiRating: 82, searches: 52000 },
+  { symbol: 'HDFCBANK', name: 'HDFC Bank', price: 1678.90, changePercent: 2.04, reason: 'Strong Q1 advance reporting', aiRating: 88, searches: 41000 },
+  { symbol: 'ADANIENT', name: 'Adani Ent.', price: 3156.80, changePercent: 1.88, reason: 'New green energy contract won', aiRating: 72, searches: 35000 },
+];

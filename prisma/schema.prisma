@@ -1,0 +1,390 @@
+// Prisma schema for AI Stock Intelligence Platform — PRODUCTION
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─── USER & AUTH ───
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  phone         String?   @unique
+  image         String?
+  password      String?
+  riskPreference String  @default("moderate")
+  goals         String?   // JSON array
+  age           Int?
+  salary        Int?
+  monthlySavings Int?
+  emergencyFund  Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  portfolioHoldings PortfolioHolding[]
+  watchlists        Watchlist[]
+  bookmarks         Bookmark[]
+  chatMessages      ChatMessage[]
+  riskProfiles      RiskProfile[]
+  learningProgress  LearningProgress[]
+  notifications     Notification[]
+}
+
+// ─── STOCKS ───
+
+model Stock {
+  id            String   @id @default(cuid())
+  symbol        String   @unique
+  name          String
+  exchange      String   @default("NSE")
+  sector        String
+  industry      String
+  capCategory   String   // Large Cap, Mid Cap, Small Cap
+  description   String?
+  website       String?
+  ceo           String?
+  employees     Int?
+  headquarters  String?
+  founded       String?
+  isin          String?
+  lotSize       Int      @default(1)
+
+  // Prices
+  currentPrice  Float
+  previousClose Float
+  open          Float
+  dayHigh       Float
+  dayLow        Float
+  weekHigh52    Float
+  weekLow52     Float
+  volume        Int
+  avgVolume     Int
+  marketCap     Float
+
+  // Fundamentals
+  pe            Float    @default(0)
+  pb            Float    @default(0)
+  eps           Float    @default(0)
+  dividendYield Float    @default(0)
+  beta          Float    @default(1)
+  roe           Float    @default(0)
+  roce          Float    @default(0)
+  debtToEquity  Float    @default(0)
+  bookValue     Float    @default(0)
+  faceValue     Float    @default(10)
+
+  // Growth
+  revenueGrowth Float    @default(0)
+  profitGrowth  Float    @default(0)
+  revenueQoQ    Float    @default(0)
+  profitQoQ     Float    @default(0)
+
+  // Revenue & Profit (latest annual in Cr)
+  revenue       Float    @default(0)
+  netProfit     Float    @default(0)
+  operatingMargin Float  @default(0)
+  netMargin     Float    @default(0)
+
+  // Holdings
+  promoterHolding Float  @default(0)
+  fiiHolding      Float  @default(0)
+  diiHolding      Float  @default(0)
+  publicHolding   Float  @default(0)
+
+  // Change
+  change        Float    @default(0)
+  changePercent Float    @default(0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  priceHistory  PriceHistory[]
+  quarterlyResults QuarterlyResult[]
+  portfolioHoldings PortfolioHolding[]
+  watchlistItems WatchlistItem[]
+  bookmarks     Bookmark[]        @relation("StockBookmarks")
+  newsStocks    NewsStock[]
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  stockId   String
+  stock     Stock    @relation(fields: [stockId], references: [id])
+  date      DateTime
+  open      Float
+  high      Float
+  low       Float
+  close     Float
+  volume    Int
+  timeframe String   @default("1D") // 1m, 5m, 15m, 30m, 1h, 1D, 1W, 1M
+
+  @@index([stockId, date])
+  @@index([stockId, timeframe, date])
+}
+
+model QuarterlyResult {
+  id           String @id @default(cuid())
+  stockId      String
+  stock        Stock  @relation(fields: [stockId], references: [id])
+  quarter      String // Q1 FY25, Q2 FY25, etc.
+  revenue      Float
+  netProfit    Float
+  eps          Float
+  operatingMargin Float @default(0)
+  yoyGrowth    Float   @default(0)
+
+  @@index([stockId])
+}
+
+// ─── MUTUAL FUNDS ───
+
+model MutualFund {
+  id             String   @id @default(cuid())
+  name           String
+  amc            String   // Asset Management Company
+  category       String   // Equity, Hybrid, Debt, etc.
+  subCategory    String   // Large Cap, Mid Cap, ELSS, etc.
+  nav            Float
+  navDate        DateTime @default(now())
+  aum            Float    // in Cr
+  expenseRatio   Float
+  exitLoad       String   @default("1% if redeemed within 1 year")
+  riskRating     String   // Low, Moderate, Moderately High, High, Very High
+  rating         Int      @default(3) // 1-5 stars
+  fundManager    String?
+  launchDate     DateTime?
+  benchmark      String?
+  minSIP         Int      @default(500)
+  minLumpsum     Int      @default(5000)
+
+  // Returns (annualized %)
+  return1Y       Float    @default(0)
+  return3Y       Float    @default(0)
+  return5Y       Float    @default(0)
+  return10Y      Float    @default(0)
+  returnSI       Float    @default(0) // Since inception
+
+  // Holdings info (JSON strings)
+  topHoldings    String?  // JSON: [{name, weight}]
+  sectorAllocation String? // JSON: [{sector, weight}]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  bookmarks      Bookmark[] @relation("MFBookmarks")
+}
+
+// ─── NEWS ───
+
+model NewsArticle {
+  id             String   @id @default(cuid())
+  title          String
+  summary        String
+  content        String?
+  source         String
+  category       String   // market, stocks, economy, ipo, rbi, global, etc.
+  imageUrl       String?
+  publishedAt    DateTime @default(now())
+
+  // AI Analysis
+  aiSentiment    String   @default("Neutral") // Positive, Negative, Neutral
+  aiAnalysis     String?
+  aiImpactScore  Int      @default(0) // -10 to +10
+  bullishScore   Int      @default(50) // 0-100
+  bearishScore   Int      @default(50)
+
+  createdAt      DateTime @default(now())
+
+  relatedStocks  NewsStock[]
+  bookmarks      Bookmark[] @relation("NewsBookmarks")
+}
+
+model NewsStock {
+  id        String      @id @default(cuid())
+  newsId    String
+  news      NewsArticle @relation(fields: [newsId], references: [id])
+  stockId   String
+  stock     Stock       @relation(fields: [stockId], references: [id])
+
+  @@unique([newsId, stockId])
+}
+
+// ─── LEARNING ───
+
+model LearningModule {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  icon         String   @default("📚")
+  difficulty   String   // beginner, intermediate, advanced
+  category     String   // basics, technical, fundamental, trading, etc.
+  estimatedTime String  @default("30 min")
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  lessons      Lesson[]
+  bookmarks    Bookmark[] @relation("LearningBookmarks")
+}
+
+model Lesson {
+  id           String         @id @default(cuid())
+  moduleId     String
+  module       LearningModule @relation(fields: [moduleId], references: [id])
+  title        String
+  content      String         // Markdown content
+  type         String         @default("article") // article, quiz, exercise
+  sortOrder    Int            @default(0)
+  estimatedTime String        @default("10 min")
+
+  quizQuestions QuizQuestion[]
+  progress      LearningProgress[]
+}
+
+model QuizQuestion {
+  id           String @id @default(cuid())
+  lessonId     String
+  lesson       Lesson @relation(fields: [lessonId], references: [id])
+  question     String
+  options      String // JSON array of strings
+  correctIndex Int
+  explanation  String?
+  sortOrder    Int    @default(0)
+}
+
+model LearningProgress {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  lessonId   String
+  lesson     Lesson   @relation(fields: [lessonId], references: [id])
+  completed  Boolean  @default(false)
+  score      Int?     // Quiz score if applicable
+  completedAt DateTime?
+
+  @@unique([userId, lessonId])
+}
+
+// ─── PORTFOLIO ───
+
+model PortfolioHolding {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  stockId      String
+  stock        Stock    @relation(fields: [stockId], references: [id])
+  quantity     Int
+  avgPrice     Float
+  boughtAt     DateTime @default(now())
+  notes        String?
+
+  @@unique([userId, stockId])
+  @@index([userId])
+}
+
+// ─── WATCHLIST ───
+
+model Watchlist {
+  id        String          @id @default(cuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id])
+  name      String          @default("My Watchlist")
+  sortOrder Int             @default(0)
+  createdAt DateTime        @default(now())
+
+  items     WatchlistItem[]
+
+  @@index([userId])
+}
+
+model WatchlistItem {
+  id          String    @id @default(cuid())
+  watchlistId String
+  watchlist   Watchlist @relation(fields: [watchlistId], references: [id], onDelete: Cascade)
+  stockId     String
+  stock       Stock     @relation(fields: [stockId], references: [id])
+  sortOrder   Int       @default(0)
+  addedAt     DateTime  @default(now())
+
+  @@unique([watchlistId, stockId])
+}
+
+// ─── BOOKMARKS ───
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // stock, mutualfund, news, learning
+  createdAt DateTime @default(now())
+
+  // Polymorphic relations
+  stockId   String?
+  stock     Stock?         @relation("StockBookmarks", fields: [stockId], references: [id])
+  fundId    String?
+  fund      MutualFund?    @relation("MFBookmarks", fields: [fundId], references: [id])
+  newsId    String?
+  news      NewsArticle?   @relation("NewsBookmarks", fields: [newsId], references: [id])
+  moduleId  String?
+  module    LearningModule? @relation("LearningBookmarks", fields: [moduleId], references: [id])
+
+  @@unique([userId, type, stockId])
+  @@index([userId, type])
+}
+
+// ─── AI CHAT ───
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  role      String   // user, assistant
+  content   String
+  metadata  String?  // JSON: related stocks, charts, etc.
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// ─── RISK PROFILE ───
+
+model RiskProfile {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  age             Int
+  salary          Int
+  monthlySavings  Int
+  currentInvestments Float @default(0)
+  emergencyFund   Float    @default(0)
+  riskAppetite    String   // conservative, moderate, aggressive, very_aggressive
+  goals           String   // JSON array
+  riskScore       Float    @default(0)
+  diversificationScore Float @default(0)
+  suggestions     String?  // JSON
+  projectedWealth String?  // JSON
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ─── NOTIFICATIONS ───
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      String   // price, ai, market, system
+  read      Boolean  @default(false)
+  metadata  String?  // JSON
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+}
