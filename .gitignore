@@ -51,3 +51,6 @@ dev.db-journal
 
 # generated
 src/generated/
+
+.vercel
+.env*
